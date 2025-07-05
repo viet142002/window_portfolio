@@ -13,7 +13,7 @@ export interface IAppInfo {
 interface ApplicationState {
     apps: Record<string, IAppInfo>
     maxIndex: number
-    updateApp: (appId: string, info: IAppInfo) => void
+    updateApp: (appId: string, info: Partial<IAppInfo>) => void
     closeApp: (appId: string) => void
     initApp: (appId: string, info: IAppInfo) => void
     activeApp: (appId: string) => void
@@ -22,8 +22,8 @@ interface ApplicationState {
 const useApplication = create<ApplicationState>((set) => ({
     maxIndex: 0,
     apps: {},
-    updateApp: (appId: string, info: IAppInfo) => set((state) => {
-        return { apps: { ...state.apps, [appId]: info } }
+    updateApp: (appId, info) => set((state) => {
+        return { apps: { ...state.apps, [appId]: { ...state.apps[appId], ...info } } }
     }),
     closeApp: (appId: string) => set((state) => {
         const apps = { ...state.apps }
@@ -41,6 +41,10 @@ const useApplication = create<ApplicationState>((set) => ({
     activeApp: (appId: string) => set((state) => {
         const apps = { ...state.apps }
         const maxIndex = state.maxIndex + 1;
+        const appActiveCurrent = Object.keys(apps).find(key => apps[key].isActive);
+        if (appActiveCurrent === appId) {
+            return state;
+        }
         Object.keys(apps).forEach((key) => {
             if (key === appId) {
                 apps[key] = { ...apps[key], isActive: true, zIndex: maxIndex }

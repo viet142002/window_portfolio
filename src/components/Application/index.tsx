@@ -3,6 +3,7 @@
 import { Center, Tooltip } from "@/components/common";
 import useApplication from "@/stores/useApplication";
 import { memo, ReactNode } from "react";
+import { useShallow } from 'zustand/shallow';
 
 interface ApplicationProps {
     icon: ReactNode;
@@ -11,7 +12,7 @@ interface ApplicationProps {
 }
 
 function Application({ icon, label, appId }: ApplicationProps) {
-    const appInfo = useApplication(state => state.apps[appId]);
+    const appInfo = useApplication(useShallow(state => state.apps[appId]));
     const initApp = useApplication(state => state.initApp);
     const activeApp = useApplication(state => state.activeApp);
 
@@ -19,7 +20,7 @@ function Application({ icon, label, appId }: ApplicationProps) {
 
     const handleClickApp = () => {
         if (!isOpened) {
-            initApp(appId, { zIndex: 0, size: [200, 200], position: [0, 0], isActive: true, nameApp: label, appId });
+            initApp(appId, { zIndex: 0, size: [500, 500], position: [0, 0], isActive: true, nameApp: label, appId });
         } else {
             activeApp(appId);
         }
